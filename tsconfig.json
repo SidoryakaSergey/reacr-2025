@@ -5,6 +5,8 @@
     "module": "ESNext",
     "lib": ["ES2024", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
+    "types": ["vitest", "vite/client"],
+    "typeRoots": ["./node_modules/@types", "./src"],
 
     /* Bundler mode */
     "moduleResolution": "bundler",

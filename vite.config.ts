@@ -10,16 +10,6 @@ export default defineConfig(({ mode }) => {
     build: {
       target: 'es2022',
     },
-    test: {
-      environment: 'jsdom',
-      globals: true,
-      setupFiles: './tests/setup.js',
-      coverage: {
-        provider: 'istanbul',
-        reporter: ['text', 'json', 'html'],
-        exclude: ['**/*.d.ts', '**/*.config.ts', 'tests/**', 'src/constants/**', 'src/types/**', 'dist', 'coverage'],
-      },
-    },
   };
 
   if (mode === 'production') {
