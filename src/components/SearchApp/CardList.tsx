@@ -1,20 +1,16 @@
 import React from 'react';
 import Card from './Card';
-
-interface Character {
-  id: number;
-  name: string;
-  image: string;
-}
+import { CharacterPreview } from '../../types';
 
 interface Props {
-  characters: Character[];
+  characters: CharacterPreview[];
+  onCardClick: (id: number) => void;
 }
 
-const CardList: React.FC<Props> = ({ characters }) => (
+const CardList: React.FC<Props> = ({ characters, onCardClick }) => (
   <div className="results-body">
     {characters.map((char) => (
-      <Card key={char.id} name={char.name} image={char.image} />
+      <Card key={char.id} id={char.id} name={char.name} image={char.image} onClick={onCardClick} />
     ))}
   </div>
 );

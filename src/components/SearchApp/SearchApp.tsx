@@ -1,20 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useParams, useNavigate, Outlet } from 'react-router-dom';
 import SearchControls from './SearchControls';
 import CardList from './CardList';
-import { Character, ApiResponse } from '../../types';
+import { CharacterPreview, ApiResponse } from '../../types';
 import { useLocalStorageQuery } from '../../hooks/useLocalStorageQuery';
 
 const SearchApp: React.FC = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const { page: pageParam } = useParams();
+  const { detailsId } = useParams();
+  const page = parseInt(pageParam || '1', 10);
+  const navigate = useNavigate();
+
   const [inputValue, setInputValue] = useState(() => localStorage.getItem('savedSearchRick') || '');
   const [searchTerm, setSearchTerm] = useLocalStorageQuery('savedSearchRick', '');
-  const [searchResults, setSearchResults] = useState<Character[]>([]);
+  const [searchResults, setSearchResults] = useState<CharacterPreview[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
-
-  const page = parseInt(searchParams.get('page') || '1', 10);
 
   const fetchData = async (term: string, pageNumber: number) => {
     try {
@@ -27,7 +29,6 @@ const SearchApp: React.FC = () => {
         : 'https://rickandmortyapi.com/api/character?';
 
       const url = `${baseUrl}page=${pageNumber}`;
-
       const res = await fetch(url);
       if (!res.ok) throw new Error('Failed to fetch');
 
@@ -44,7 +45,7 @@ const SearchApp: React.FC = () => {
     } catch (err) {
       console.error('API Error:', err);
       setHasError(true);
-      setSearchResults([]); // очистим при ошибке
+      setSearchResults([]);
     } finally {
       setIsLoading(false);
     }
@@ -61,36 +62,49 @@ const SearchApp: React.FC = () => {
   const handleSearch = () => {
     const trimmed = inputValue.trim();
     setSearchTerm(trimmed);
-    setSearchParams({ page: '1' });
+    navigate('/1');
   };
 
   const goToPage = (newPage: number) => {
-    setSearchParams({ page: String(newPage) });
+    navigate(`/${newPage}`);
+  };
+
+  const handleCardClick = (id: number) => {
+    navigate(`/${page}/${id}`);
   };
 
   return (
-    <div>
-      <SearchControls searchTerm={inputValue} onInputChange={handleInputChange} onSearch={handleSearch} />
+    <div className="layout-container">
+      <div className="left-panel">
+        <SearchControls searchTerm={inputValue} onInputChange={handleInputChange} onSearch={handleSearch} />
 
-      {/* Пагинация */}
-      <div className="pagination">
-        <button disabled={page <= 1} onClick={() => goToPage(page - 1)}>
-          Prev
-        </button>
-        <span>
-          Page {page} of {totalPages}
-        </span>
-        <button disabled={page >= totalPages} onClick={() => goToPage(page + 1)}>
-          Next
-        </button>
+        {totalPages > 1 && (
+          <div className="pagination top">
+            <button disabled={page <= 1} onClick={() => goToPage(page - 1)}>
+              Prev
+            </button>
+            <span>
+              Page {page} of {totalPages}
+            </span>
+            <button disabled={page >= totalPages} onClick={() => goToPage(page + 1)}>
+              Next
+            </button>
+          </div>
+        )}
+
+        {isLoading ? (
+          <p>Loading...</p>
+        ) : hasError ? (
+          <div>Something went wrong while fetching data.</div>
+        ) : (
+          <CardList characters={searchResults} onCardClick={handleCardClick} />
+        )}
       </div>
 
-      {isLoading ? (
-        <p>Loading...</p>
-      ) : hasError ? (
-        <div>Something went wrong while fetching data.</div>
-      ) : (
-        <CardList characters={searchResults} />
+      {detailsId && (
+        <div className="right-panel">
+          <Outlet />
+        </div>
       )}
     </div>
   );

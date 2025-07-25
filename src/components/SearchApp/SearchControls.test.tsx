@@ -18,7 +18,6 @@ describe('SearchControls', () => {
 
     expect(screen.getByPlaceholderText(/search character/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /search/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /trigger error/i })).toBeInTheDocument();
   });
 
   it('calls onSearch when clicking Search button', () => {

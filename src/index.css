@@ -43,3 +43,24 @@
   gap: 0.5rem;
   margin-bottom: 1rem;
 }
+
+.layout-container {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  align-items: flex-start;
+}
+
+.left-panel {
+  flex-grow: 0;
+  flex-shrink: 0;
+  flex-basis: 300px;
+}
+
+.right-panel {
+  flex-shrink: 0;
+  flex-grow: 0;
+  width: 300px;
+  border-left: 1px solid #ccc;
+  padding-left: 20px;
+}

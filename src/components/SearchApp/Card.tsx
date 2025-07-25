@@ -1,12 +1,14 @@
 import React from 'react';
 
 interface Props {
+  id: number;
   name: string;
   image: string;
+  onClick: (id: number) => void;
 }
 
-const Card: React.FC<Props> = ({ name, image }) => (
-  <div className="card">
+const Card: React.FC<Props> = ({ id, name, image, onClick }) => (
+  <div className="card" onClick={() => onClick(id)}>
     <img src={image} alt={name} />
     <p className="name">{name}</p>
   </div>
