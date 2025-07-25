@@ -1,44 +1,34 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import SearchControls from './SearchControls';
 import CardList from './CardList';
 import { Character, ApiResponse } from '../../types';
+import { useLocalStorageQuery } from '../../hooks/useLocalStorageQuery';
 
-interface State {
-  searchTerm: string;
-  searchResults: Character[];
-  isLoading: boolean;
-  hasError: boolean;
-  triggerError: boolean;
-}
+const SearchApp: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [inputValue, setInputValue] = useState(() => localStorage.getItem('savedSearchRick') || '');
+  const [searchTerm, setSearchTerm] = useLocalStorageQuery('savedSearchRick', '');
+  const [searchResults, setSearchResults] = useState<Character[]>([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasError, setHasError] = useState(false);
 
-class SearchApp extends React.Component<object, State> {
-  constructor(props: object) {
-    super(props);
-    this.state = {
-      searchTerm: localStorage.getItem('savedSearchRick') || '',
-      searchResults: [],
-      isLoading: false,
-      hasError: false,
-      triggerError: false,
-    };
-  }
+  const page = parseInt(searchParams.get('page') || '1', 10);
 
-  componentDidMount() {
-    this.handleSearch();
-  }
-
-  handleSearch = async () => {
+  const fetchData = async (term: string, pageNumber: number) => {
     try {
-      const trimmed = this.state.searchTerm.trim();
-      localStorage.setItem('savedSearchRick', trimmed);
-      this.setState({ isLoading: true, hasError: false });
+      setIsLoading(true);
+      setHasError(false);
 
-      const url = trimmed
-        ? `https://rickandmortyapi.com/api/character/?name=${trimmed}`
-        : 'https://rickandmortyapi.com/api/character';
+      const trimmed = term.trim();
+      const baseUrl = trimmed
+        ? `https://rickandmortyapi.com/api/character/?name=${trimmed}&`
+        : 'https://rickandmortyapi.com/api/character?';
+
+      const url = `${baseUrl}page=${pageNumber}`;
 
       const res = await fetch(url);
-
       if (!res.ok) throw new Error('Failed to fetch');
 
       const data: ApiResponse = await res.json();
@@ -49,47 +39,61 @@ class SearchApp extends React.Component<object, State> {
         image: char.image,
       }));
 
-      this.setState({ searchResults: characters, isLoading: false });
+      setSearchResults(characters);
+      setTotalPages(data.info.pages);
     } catch (err) {
       console.error('API Error:', err);
-      this.setState({ hasError: true, isLoading: false });
+      setHasError(true);
+      setSearchResults([]); // очистим при ошибке
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ searchTerm: e.target.value });
+  useEffect(() => {
+    fetchData(searchTerm, page);
+  }, [searchTerm, page]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
   };
 
-  handleErrorTrigger = () => {
-    this.setState({ triggerError: true });
+  const handleSearch = () => {
+    const trimmed = inputValue.trim();
+    setSearchTerm(trimmed);
+    setSearchParams({ page: '1' });
   };
 
-  render() {
-    const { searchTerm, searchResults, isLoading, hasError, triggerError } = this.state;
+  const goToPage = (newPage: number) => {
+    setSearchParams({ page: String(newPage) });
+  };
 
-    if (triggerError) {
-      throw new Error('Manual test error from render()');
-    }
+  return (
+    <div>
+      <SearchControls searchTerm={inputValue} onInputChange={handleInputChange} onSearch={handleSearch} />
 
-    return (
-      <div>
-        <SearchControls
-          searchTerm={searchTerm}
-          onInputChange={this.handleInputChange}
-          onSearch={this.handleSearch}
-          onErrorClick={this.handleErrorTrigger}
-        />
-
-        {isLoading ? (
-          <p>Loading...</p>
-        ) : hasError ? (
-          <div>Something went wrong while fetching data.</div>
-        ) : (
-          <CardList characters={searchResults} />
-        )}
+      {/* Пагинация */}
+      <div className="pagination">
+        <button disabled={page <= 1} onClick={() => goToPage(page - 1)}>
+          Prev
+        </button>
+        <span>
+          Page {page} of {totalPages}
+        </span>
+        <button disabled={page >= totalPages} onClick={() => goToPage(page + 1)}>
+          Next
+        </button>
       </div>
-    );
-  }
-}
+
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : hasError ? (
+        <div>Something went wrong while fetching data.</div>
+      ) : (
+        <CardList characters={searchResults} />
+      )}
+    </div>
+  );
+};
 
 export default SearchApp;
