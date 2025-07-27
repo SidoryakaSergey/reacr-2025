@@ -1,0 +1,79 @@
+.about-container {
+  min-height: 100vh;
+  width: 100%;
+  background: linear-gradient(135deg, #00cc33, #1a2a6c);
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.about-container::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(0, 246, 255, 0.3), transparent);
+  transform: translate(-50%, -50%);
+  animation: portalGlow 4s ease-in-out infinite;
+  z-index: 0;
+}
+
+@keyframes portalGlow {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.5;
+  }
+}
+
+.about-title {
+  font-family: 'Get Schwifty', sans-serif;
+  color: #ffff00;
+  font-size: 3rem;
+  text-align: center;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.about-content {
+  max-width: 800px;
+  margin: 0 auto;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 1;
+}
+
+.about-text {
+  color: #ffffff;
+  font-family: 'Arial', sans-serif;
+  font-size: 1.2rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.highlight {
+  color: #00f6ff;
+  font-weight: bold;
+}
+
+.about-btn {
+  display: block;
+  margin: 0 auto;
+  text-align: center;
+  font-size: 1.4rem;
+  padding: 1rem 2rem;
+}

@@ -1,0 +1,73 @@
+.notfound-container {
+  height: 100vh;
+  width: 100%;
+  background: linear-gradient(135deg, #1a2a6c, #00cc33);
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.notfound-container::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(0, 246, 255, 0.4), transparent);
+  transform: translate(-50%, -50%);
+  animation: portalSpin 6s linear infinite;
+  z-index: 0;
+}
+
+@keyframes portalSpin {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg) scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translate(-50%, -50%) rotate(180deg) scale(1.1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg) scale(1);
+    opacity: 0.5;
+  }
+}
+
+.notfound-title {
+  font-family: 'Get Schwifty', sans-serif;
+  color: #ffff00;
+  font-size: 3.5rem;
+  text-align: center;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.notfound-text {
+  color: #ffffff;
+  font-family: 'Arial', sans-serif;
+  font-size: 1.3rem;
+  line-height: 1.6;
+  text-align: center;
+  max-width: 600px;
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.highlight {
+  color: #00f6ff;
+  font-weight: bold;
+}
+
+.notfound-btn {
+  font-size: 1.4rem;
+  padding: 1rem 2rem;
+}

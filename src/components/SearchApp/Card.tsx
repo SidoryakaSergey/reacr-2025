@@ -8,7 +8,7 @@ interface Props {
 }
 
 const Card: React.FC<Props> = ({ id, name, image, onClick }) => (
-  <div className="card" onClick={() => onClick(id)}>
+  <div className="card" role="button" onClick={() => onClick(id)}>
     <img src={image} alt={name} />
     <p className="name">{name}</p>
   </div>

@@ -1,15 +1,16 @@
 import { render, screen } from '@testing-library/react';
-import Card from './Card';
-import { describe, it, expect } from 'vitest';
+import CardList from './CardList';
+import { describe, it, expect, vi } from 'vitest';
 
 describe('Card', () => {
-  it('renders character name and image', () => {
-    render(<Card name="Rick Sanchez" image="rick.png" />);
+  it('calls onCardClick when a card is clicked', () => {
+    const characters = [{ id: 1, name: 'Rick Sanchez', image: 'rick.png' }];
+    const mockOnClick = vi.fn();
 
-    expect(screen.getByText('Rick Sanchez')).toBeInTheDocument();
+    render(<CardList characters={characters} onCardClick={mockOnClick} />);
 
-    const img = screen.getByAltText('Rick Sanchez') as HTMLImageElement;
-    expect(img).toBeInTheDocument();
-    expect(img.src).toContain('rick.png');
+    screen.getByRole('button', { name: /Rick Sanchez/i }).click();
+
+    expect(mockOnClick).toHaveBeenCalledWith(1);
   });
 });

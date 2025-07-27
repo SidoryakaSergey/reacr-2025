@@ -1,7 +1,6 @@
-// components/CharacterDetails.tsx
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Character } from '../types';
+import { Character } from '../../types';
 
 const CharacterDetails: React.FC = () => {
   const { detailsId } = useParams();
@@ -21,18 +20,18 @@ const CharacterDetails: React.FC = () => {
   }, [detailsId]);
 
   const handleClose = () => {
-    navigate(`../`, { relative: 'path' }); // Убираем detailsId из URL
+    navigate(`../`, { relative: 'path' });
   };
 
   if (loading) return <p>Loading character...</p>;
   if (!character) return <p>Character not found</p>;
 
   return (
-    <div className="character-details">
+    <div className="character-details" data-testid="character-details">
       <button onClick={handleClose}>Close</button>
       <h2>{character.name}</h2>
       <img src={character.image} alt={character.name} />
-      <ul>
+      <ul className="list-character">
         <li>Status: {character.status}</li>
         <li>Species: {character.species}</li>
         <li>Type: {character.type || 'N/A'}</li>

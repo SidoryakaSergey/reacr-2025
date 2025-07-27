@@ -1,80 +1,127 @@
-// import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-// import { render, screen, waitFor } from '@testing-library/react';
-// import SearchApp from './SearchApp';
-// import { Character, ApiResponse } from '../../types';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
+import SearchApp from './SearchApp';
+import CharacterDetails from './CharacterDetails';
+import { vi, beforeEach, describe, it, expect } from 'vitest';
+import { ApiResponse } from '../../types';
 
-// const mockCharacters: Character[] = [
-//   { id: 1, name: 'Rick Sanchez', image: 'rick.png' },
-//   { id: 2, name: 'Morty Smith', image: 'morty.png' },
-// ];
+const mockCharacter = {
+  id: 1,
+  name: 'Rick Sanchez',
+  status: 'Alive',
+  species: 'Human',
+  type: '',
+  gender: 'Male',
+  origin: { name: 'Earth', url: '' },
+  location: { name: 'Citadel of Ricks', url: '' },
+  image: 'rick.png',
+  episode: [],
+  url: '',
+  created: '',
+};
 
-// const mockResponse: ApiResponse = {
-//   info: {
-//     count: 2,
-//     pages: 1,
-//     next: null,
-//     prev: null,
-//   },
-//   results: mockCharacters,
-// };
+const mockFetch = (response: ApiResponse, ok = true) =>
+  vi.fn(() =>
+    Promise.resolve({
+      ok,
+      json: () => Promise.resolve(response),
+    }),
+  );
 
-// describe('SearchApp', () => {
-//   const fetchMock = vi.fn();
+beforeEach(() => {
+  vi.restoreAllMocks();
+  localStorage.clear();
+});
 
-//   beforeEach(() => {
-//     vi.stubGlobal('fetch', fetchMock);
-//     vi.spyOn(global.localStorage.__proto__, 'getItem').mockReturnValue('');
-//     vi.spyOn(global.localStorage.__proto__, 'setItem').mockImplementation(() => {});
-//   });
+const renderWithRouter = (initialRoute = '/1') => {
+  return render(
+    <MemoryRouter initialEntries={[initialRoute]}>
+      <Routes>
+        <Route path=":page" element={<SearchApp />}>
+          <Route path=":detailsId" element={<CharacterDetails />} />
+        </Route>
+      </Routes>
+    </MemoryRouter>,
+  );
+};
 
-//   afterEach(() => {
-//     vi.restoreAllMocks();
-//   });
+describe('SearchApp', () => {
+  it('searches and displays characters', async () => {
+    const searchResponse = {
+      info: { count: 1, pages: 1, next: null, prev: null },
+      results: [mockCharacter],
+    };
 
-//   it('renders input and buttons', () => {
-//     fetchMock.mockResolvedValueOnce({
-//       ok: true,
-//       json: async () => mockResponse,
-//     });
+    vi.stubGlobal('fetch', mockFetch(searchResponse));
 
-//     render(<SearchApp />);
-//     expect(screen.getByPlaceholderText(/search character/i)).toBeInTheDocument();
-//     expect(screen.getByText(/search/i)).toBeInTheDocument();
-//     expect(screen.getByText(/trigger error/i)).toBeInTheDocument();
-//   });
+    renderWithRouter('/1');
 
-//   it('loads characters from API and renders them', async () => {
-//     fetchMock.mockResolvedValueOnce({
-//       ok: true,
-//       json: async () => mockResponse,
-//     });
+    fireEvent.change(screen.getByPlaceholderText(/search character/i), {
+      target: { value: 'Rick' },
+    });
+    fireEvent.click(screen.getByText(/search/i));
 
-//     render(<SearchApp />);
+    expect(await screen.findByText(/rick sanchez/i)).toBeInTheDocument();
+    expect(screen.getByAltText(/rick sanchez/i)).toHaveAttribute('src', 'rick.png');
+  });
 
-//     await waitFor(() => {
-//       expect(screen.getByText('Rick Sanchez')).toBeInTheDocument();
-//       expect(screen.getByText('Morty Smith')).toBeInTheDocument();
-//     });
-//   });
+  it('navigates to character details on card click', async () => {
+    const searchResponse = {
+      info: { count: 1, pages: 1, next: null, prev: null },
+      results: [mockCharacter],
+    };
 
-//   it('handles API error and displays error message', async () => {
-//     fetchMock.mockResolvedValueOnce({
-//       ok: false,
-//     });
+    const detailsResponse = mockCharacter;
 
-//     render(<SearchApp />);
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((url: string) => {
+        if (url.includes('/character/1')) {
+          return Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve(detailsResponse),
+          });
+        }
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve(searchResponse),
+        });
+      }),
+    );
 
-//     await waitFor(() => {
-//       expect(screen.getByText(/something went wrong/i)).toBeInTheDocument();
-//     });
-//   });
+    renderWithRouter('/1');
 
-//   it('throws error when triggerError is true', () => {
-//     fetchMock.mockResolvedValueOnce({
-//       ok: true,
-//       json: async () => mockResponse,
-//     });
+    fireEvent.change(screen.getByPlaceholderText(/search character/i), {
+      target: { value: 'Rick' },
+    });
+    fireEvent.click(screen.getByText(/search/i));
 
-//     vi.spyOn(console, 'error').mockImplementation(() => {});
-//   });
-// });
+    const characterCard = await screen.findByText(/rick sanchez/i);
+    fireEvent.click(characterCard);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('right-panel')).toBeInTheDocument();
+      expect(screen.getByText(/status:/i)).toBeInTheDocument();
+    });
+  });
+
+  it('shows message when no characters found', async () => {
+    const emptyResponse = {
+      info: { count: 0, pages: 0, next: null, prev: null },
+      results: [],
+    };
+
+    vi.stubGlobal('fetch', mockFetch(emptyResponse));
+
+    renderWithRouter('/1');
+
+    fireEvent.change(screen.getByPlaceholderText(/search character/i), {
+      target: { value: 'NonExistentName' },
+    });
+    fireEvent.click(screen.getByText(/search/i));
+
+    await waitFor(() => {
+      expect(screen.getByText(/no characters found/i)).toBeInTheDocument();
+    });
+  });
+});

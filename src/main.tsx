@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
 import App from './App';
 import SearchApp from './components/SearchApp/SearchApp';
-import CharacterDetails from './components/CharacterDetails';
+import CharacterDetails from './components/SearchApp/CharacterDetails';
 import About from './pages/About';
 import NotFound from './pages/NotFound';
 import './index.css';
@@ -32,8 +32,12 @@ const router = createBrowserRouter([
         element: <About />,
       },
       {
-        path: '*',
+        path: '404',
         element: <NotFound />,
+      },
+      {
+        path: '*',
+        element: <Navigate to="/404" replace />,
       },
     ],
   },

@@ -1,12 +1,18 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
+import './AppHeader.css';
 
 const AppHeader: React.FC = () => {
   return (
-    <header>
-      <h1>The Rick and Morty API</h1>
-      <nav>
-        <Link to="/">Home</Link> | <Link to="/about">About</Link>
+    <header className="header">
+      <h1 className="header-title">The Rick and Morty API</h1>
+      <nav className="nav-menu">
+        <NavLink to="/" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+          Home
+        </NavLink>
+        <NavLink to="/about" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+          About
+        </NavLink>
       </nav>
     </header>
   );

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate, Outlet } from 'react-router-dom';
+import { useParams, useNavigate, Outlet, Navigate } from 'react-router-dom';
 import SearchControls from './SearchControls';
 import CardList from './CardList';
 import { CharacterPreview, ApiResponse } from '../../types';
@@ -55,6 +55,10 @@ const SearchApp: React.FC = () => {
     fetchData(searchTerm, page);
   }, [searchTerm, page]);
 
+  if (isNaN(page) || page < 1) {
+    return <Navigate to="/404" replace />;
+  }
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
   };
@@ -74,7 +78,7 @@ const SearchApp: React.FC = () => {
   };
 
   return (
-    <div className="layout-container">
+    <div className="layout-container" data-testid="search-app">
       <div className="left-panel">
         <SearchControls searchTerm={inputValue} onInputChange={handleInputChange} onSearch={handleSearch} />
 
@@ -96,13 +100,15 @@ const SearchApp: React.FC = () => {
           <p>Loading...</p>
         ) : hasError ? (
           <div>Something went wrong while fetching data.</div>
+        ) : searchResults.length === 0 ? (
+          <p>No characters found.</p>
         ) : (
           <CardList characters={searchResults} onCardClick={handleCardClick} />
         )}
       </div>
 
       {detailsId && (
-        <div className="right-panel">
+        <div className="right-panel" data-testid="right-panel">
           <Outlet />
         </div>
       )}
