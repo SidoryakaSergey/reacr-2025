@@ -8,14 +8,7 @@ describe('SearchControls', () => {
     const handleSearch = vi.fn();
     const handleError = vi.fn();
 
-    render(
-      <SearchControls
-        searchTerm="Rick"
-        onInputChange={handleInput}
-        onSearch={handleSearch}
-        onErrorClick={handleError}
-      />,
-    );
+    render(<SearchControls searchTerm="Rick" onInputChange={handleInput} onSearch={handleSearch} />);
 
     return { handleInput, handleSearch, handleError };
   };
@@ -25,19 +18,12 @@ describe('SearchControls', () => {
 
     expect(screen.getByPlaceholderText(/search character/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /search/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /trigger error/i })).toBeInTheDocument();
   });
 
   it('calls onSearch when clicking Search button', () => {
     const { handleSearch } = setup();
     fireEvent.click(screen.getByRole('button', { name: /search/i }));
     expect(handleSearch).toHaveBeenCalled();
-  });
-
-  it('calls onErrorClick when clicking "Trigger Error" button', () => {
-    const { handleError } = setup();
-    fireEvent.click(screen.getByRole('button', { name: /trigger error/i }));
-    expect(handleError).toHaveBeenCalled();
   });
 
   it('calls onSearch when Enter is pressed in input field', () => {

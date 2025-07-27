@@ -1,26 +1,18 @@
 import React from 'react';
 import Card from './Card';
-
-interface Character {
-  id: number;
-  name: string;
-  image: string;
-}
+import { CharacterPreview } from '../../types';
 
 interface Props {
-  characters: Character[];
+  characters: CharacterPreview[];
+  onCardClick: (id: number) => void;
 }
 
-class CardList extends React.Component<Props> {
-  render() {
-    return (
-      <div className="results-body">
-        {this.props.characters.map((char) => (
-          <Card key={char.id} name={char.name} image={char.image} />
-        ))}
-      </div>
-    );
-  }
-}
+const CardList: React.FC<Props> = ({ characters, onCardClick }) => (
+  <div className="results-body">
+    {characters.map((char) => (
+      <Card key={char.id} id={char.id} name={char.name} image={char.image} onClick={onCardClick} />
+    ))}
+  </div>
+);
 
 export default CardList;
