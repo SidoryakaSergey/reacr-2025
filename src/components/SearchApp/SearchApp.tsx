@@ -4,6 +4,7 @@ import SearchControls from './SearchControls';
 import CardList from './CardList';
 import { CharacterPreview, ApiResponse } from '../../types';
 import { useLocalStorageQuery } from '../../hooks/useLocalStorageQuery';
+import SelectedFlyout from '../Flyout/SelectedFlyout';
 
 const SearchApp: React.FC = () => {
   const { page: pageParam } = useParams();
@@ -87,12 +88,13 @@ const SearchApp: React.FC = () => {
             <button disabled={page <= 1} onClick={() => goToPage(page - 1)}>
               Prev
             </button>
-            <span>
+            <span className="page-info">
               Page {page} of {totalPages}
             </span>
             <button disabled={page >= totalPages} onClick={() => goToPage(page + 1)}>
               Next
             </button>
+            <SelectedFlyout />
           </div>
         )}
 

@@ -16,7 +16,7 @@
   justify-content: start;
   align-items: center;
   background-color: #080808;
-  background-image: url('../public/fon.svg');
+  background-image: url('../public/fon_morty.png');
 }
 
 h1 {
@@ -29,7 +29,12 @@ h2 {
 }
 
 .results-body {
+  width: 1000px;
   margin: 10px 0;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  gap: 5px;
 }
 
 .search-btn {
@@ -44,6 +49,7 @@ h2 {
 }
 
 .card {
+  width: 200px;
   display: flex;
   flex-direction: column;
   border: 1px gray solid;
@@ -145,4 +151,8 @@ button:disabled,
 .character-details {
   background-color: #00cc33;
   border-radius: 10px;
+}
+
+.page-info {
+  color: #ccc;
 }
