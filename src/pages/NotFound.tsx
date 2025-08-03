@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import './NotFound.css';
 
 const NotFound: React.FC = () => (
   <div className="notfound-container">

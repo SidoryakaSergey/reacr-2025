@@ -1,5 +1,4 @@
 import React from 'react';
-import './About.css';
 
 const About: React.FC = () => (
   <div className="about-container" data-testid="about-page">
